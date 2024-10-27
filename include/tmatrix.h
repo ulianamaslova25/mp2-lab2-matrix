@@ -231,23 +231,19 @@ public:
     TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
     {
         if (s < 0 || s > MAX_MATRIX_SIZE) {
-            throw out_of_range("Vector size should be greater than zero");
+            throw out_of_range("Matrix size should be greater than zero");
         }
-        sz = s;
-        for (size_t i = 0; i < s; i++)
-            pMem[i] = TDynamicVector<T>(s);
+        for (size_t i = 0; i < sz; i++)
+            pMem[i] = TDynamicVector<T>(sz);
     }
 
     using TDynamicVector<TDynamicVector<T>>::operator[];
 
-    TDynamicMatrix(TDynamicVector<T>* arr, size_t s) : sz(s)
+    TDynamicMatrix(const TDynamicVector<TDynamicVector<T>>& m) : TDynamicVector<TDynamicVector<T>>(m)
     {
         if (sz == 0 || sz > MAX_MATRIX_SIZE) {
-            throw out_of_range("Vector size should be greater than zero");
+            throw out_of_range("Matrix size should be greater than zero and smaller then max size");
         }
-        assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
-        pMem = new TDynamicVector<T>[sz];
-        std::copy(arr, arr + sz, pMem);
     }
     TDynamicMatrix(const TDynamicMatrix& m)
     {
@@ -327,11 +323,6 @@ public:
     TDynamicMatrix<T> operator*(const T& val)
     {
         TDynamicMatrix<T> res(*this);
-        /*for (int i = 0; i < sz; i++) {
-            for (int j = 0; j < sz; j++) {
-                res[i][j] = (*this)[i][j] * val;
-            }
-        }*/
         for (int i = 0; i < sz; i++) {
             res[i] = (*this)[i] * val;
         }
@@ -343,14 +334,6 @@ public:
     {
         if (sz != v.size()) throw "incorrect operation";
         TDynamicVector<T> res(sz);
-        //T cnt = 0;
-        /*for (int i = 0; i < sz; i++) {
-            for (int j = 0; j < sz; j++) {
-                cnt += (*this)[i][j] * v[j];
-            }
-            res[i] = cnt;
-            cnt = 0;
-        }*/
         for (int i = 0; i < sz; i++) {
             res[i] = (*this)[i] * v;
         }
@@ -362,11 +345,6 @@ public:
     {
         if (sz != m.sz) throw "incorrect operation";
         TDynamicMatrix<T> res(sz);
-        /*for (int i = 0; i < sz; i++) {
-            for (int j = 0; j < sz; j++) {
-                res[i][j] = (*this)[i][j] + m[i][j];
-            }
-        }*/
         for (int i = 0; i < sz; i++) {
             res[i] = (*this)[i] + m[i];
         }
@@ -376,11 +354,6 @@ public:
     {
         if (sz != m.sz) throw "incorrect operation";
         TDynamicMatrix<T> res(sz);
-        /*for (int i = 0; i < sz; i++) {
-            for (int j = 0; j < sz; j++) {
-                res[i][j] = (*this)[i][j] - m[i][j];
-            }
-        }*/
         for (int i = 0; i < sz; i++) {
             res[i] = (*this)[i] - m[i];
         }
