@@ -281,4 +281,3 @@ TEST(TDynamicVector, can_move_matrix)
 	EXPECT_EQ(2, v2.size());
 	EXPECT_EQ(v3, v2);
 }
-
