@@ -25,16 +25,15 @@ protected:
 public:
     TDynamicVector(size_t size = 1) : sz(size)
     {
-        if (sz == 0 || sz > MAX_VECTOR_SIZE)
+        if (sz < 0 || sz > MAX_VECTOR_SIZE)
             throw out_of_range("Vector size should be greater than zero");
         pMem = new T[sz]{};// {}; // У типа T д.б. констуктор по умолчанию
     }
     TDynamicVector(T* arr, size_t s) : sz(s)
     {
-        if (sz == 0 || sz > MAX_VECTOR_SIZE) {
+        if (sz < 0 || sz > MAX_VECTOR_SIZE) {
             throw out_of_range("Vector size should be greater than zero");
         }
-        assert(arr != nullptr && "TDynamicVector ctor requires non-nullptr arg");
         pMem = new T[sz];
         std::copy(arr, arr + sz, pMem);
     }
@@ -124,7 +123,7 @@ public:
     // скалярные операции
     TDynamicVector operator+(T val)
     {
-        TDynamicVector res(*this);
+        TDynamicVector<T> res(*this);
         for (int i = 0; i < sz; i++) {
             res.pMem[i] += val;
         }
@@ -132,7 +131,7 @@ public:
     }
     TDynamicVector operator-(double val)
     {
-        TDynamicVector res(*this);
+        TDynamicVector<T> res(*this);
         for (int i = 0; i < sz; i++) {
             res.pMem[i] -= val;
         }
@@ -140,7 +139,7 @@ public:
     }
     TDynamicVector operator*(double val)
     {
-        TDynamicVector res(*this);
+        TDynamicVector<T> res(*this);
         for (int i = 0; i < sz; i++) {
             res.pMem[i] *= val;
         }
@@ -150,49 +149,27 @@ public:
     // векторные операции
     TDynamicVector operator+(const TDynamicVector& v)
     {
-        int maxLen = max(sz, v.sz);
-        int minLen = min(sz, v.sz);
-        TDynamicVector res(maxLen);
-        for (int i = 0; i < minLen; i++) {
+        if (sz != v.sz) throw "incorrect operation";
+        TDynamicVector<T> res(sz);
+        for (int i = 0; i < sz; i++) {
             res.pMem[i] = pMem[i] + v.pMem[i];
-        }
-        if (sz > v.sz) {
-            for (int i = minLen; i < maxLen; i++) {
-                res.pMem[i] = pMem[i];
-            }
-        }
-        if (sz < v.sz) {
-            for (int i = minLen; i < maxLen; i++) {
-                res.pMem[i] = v.pMem[i];
-            }
         }
         return res;
     }
     TDynamicVector operator-(const TDynamicVector& v)
     {
-        int maxLen = max(sz, v.sz);
-        int minLen = min(sz, v.sz);
-        TDynamicVector res(maxLen);
-        for (int i = 0; i < minLen; i++) {
+        if (sz != v.sz) throw "incorrect operation";
+        TDynamicVector<T> res(sz);
+        for (int i = 0; i < sz; i++) {
             res.pMem[i] = pMem[i] - v.pMem[i];
-        }
-        if (sz > v.sz) {
-            for (int i = minLen; i < maxLen; i++) {
-                res.pMem[i] = pMem[i];
-            }
-        }
-        if (sz < v.sz) {
-            for (int i = minLen; i < maxLen; i++) {
-                res.pMem[i] = -v.pMem[i];
-            }
         }
         return res;
     }
-    T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+    T operator*(const TDynamicVector& v) const
     {
-        int minLen = min(sz, v.sz);
+        if (sz != v.sz) throw "incorrect operation";
         T res = 0;
-        for (int i = 0; i < minLen; i++) {
+        for (int i = 0; i < sz; i++) {
             res += pMem[i] * v.pMem[i];
         }
         return res;
@@ -366,7 +343,7 @@ public:
         for (int i = 0; i < sz; i++) {
             for (int j = 0; j < sz; j++) {
                 for (int k = 0; k < sz; k++) {
-                    res[j][i] += (*this)[k][i] * m[j][k];
+                    res[j][i] += (*this)[j][k] * m[k][i];
                 }
             }
         }
